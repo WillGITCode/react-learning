@@ -38,10 +38,10 @@ const DisplayScreen = (props: DisplayScreenProps) => {
 export default App;
 
 type CalcBodyState = {
-  history: Array<CalcBodyState>;
   display: string;
   operationString: string;
   operation: number;
+  valuePhase: boolean;
   error: boolean;
 }
 
@@ -49,36 +49,38 @@ class CalculatorBody extends React.Component<{}, CalcBodyState> {
   constructor(props: object) {
     super(props);
     this.state = {
-      history: [],
       display: '0',
       operationString: '',
       operation: 0,
+      valuePhase: true,
       error: false
     };
   }
 
-  jumpTo(operation: number) {
-    this.setState({
-      display: this.state.history[operation].display,
-      operation: this.state.history[operation].operation,
-      error: this.state.history[operation].error
-    });
-  }
-
   private handleValueClick = (i: string) => {
-    //const history = this.state.history.slice(0, this.state.operation + 1);
-    this.setState({
-      display: i,
-      operation: this.state.operation + 1
-    })
+    const newState:CalcBodyState ={};
+    if(this.state.valuePhase){
+
+    }else{
+    newState["operation"] = this.state.operation + 1;
+    newState["display"] = this.state.display === "0" ?
+          i :
+          this.state.display + i;
+    newState["valuePhase"]= true
+    }
+   
+    this.setState(newState);
   }
 
   private handleOperationClick = (i: string) => {
-    //const history = this.state.history.slice(0, this.state.operation + 1);
-    this.setState({
-      display: i,
-      operation: this.state.operation + 1
-    })
+    if (this.state.valuePhase) {
+      this.setState({
+        display: i,
+        operationString: this.state.display,
+        operation: this.state.operation + 1,
+        valuePhase: false
+      })
+    }
   }
 
   render(): JSX.Element {
@@ -87,7 +89,7 @@ class CalculatorBody extends React.Component<{}, CalcBodyState> {
         <div className="body-column">
           <DisplayScreen currentValue={this.state.display} operationString={this.state.operationString} />
           <div className="button-row">
-            <button onClick={() => this.handleOperationClick("<=")} className="calc-button">{"<="}</button>
+            <button onClick={() => this.handleOperationClick("")} className="calc-button">Back</button>
             <button onClick={() => this.handleOperationClick("CE")} className="calc-button">CE</button>
             <button onClick={() => this.handleOperationClick("C")} className="calc-button">C</button>
             <button onClick={() => this.handleOperationClick("+/-")} className="calc-button">+/-</button>
@@ -117,7 +119,7 @@ class CalculatorBody extends React.Component<{}, CalcBodyState> {
           <div className="button-row">
             <button onClick={() => this.handleValueClick("0")} className="calc-button-double-width">0</button>
             <button onClick={() => this.handleValueClick(".")} className="calc-button">.</button>
-            <button onClick={() => this.handleValueClick("+")} className="calc-button">+</button>
+            <button onClick={() => this.handleOperationClick("+")} className="calc-button">+</button>
             <button onClick={() => this.handleOperationClick("=")} className="calc-button">=</button>
           </div>
         </div>

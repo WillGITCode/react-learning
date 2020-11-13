@@ -9,7 +9,7 @@ class App extends React.Component {
       operationString: '',
       currentValue: '0',
       operatorMode: false,
-      results: ''
+      resultsDisplayed: false
     }
   }
 
@@ -34,7 +34,7 @@ class App extends React.Component {
     this.setState({
       operationString: '',
       currentValue: '0',
-      results: ''
+      result: ''
     });
   }
 
@@ -64,6 +64,8 @@ class App extends React.Component {
       case '*':
         this.appendOperation(button)
         break;
+      case '(':
+      case ')':
       case '1':
       case '2':
       case '3':
@@ -108,26 +110,50 @@ class App extends React.Component {
   }
 
   runOperation = () => {
-    alert('======');
+    if (!this.state.operatorMode) {
+      this.setState({
+        currentValue: eval(this.state.operationString + this.state.currentValue).toString(),
+        operationString: this.state.operationString + this.state.currentValue,
+        resultsDisplayed: true
+      });
+    }
   }
 
   appendValue = (n) => {
-    this.setState({
-      currentValue: this.state.operatorMode ?
-        n :
-        this.state.currentValue === '0' ?
+    if (this.state.operatorMode) {
+      this.setState({
+        currentValue: n,
+        operatorMode: false
+      });
+    } else if (this.state.resultsDisplayed) {
+      this.setState({
+        currentValue: n,
+        operatorMode: false,
+        resultsDisplayed: false
+      });
+    } else {
+      this.setState({
+        currentValue: this.state.currentValue === '0' ?
           n :
           this.state.currentValue + n,
-      operatorMode: false
-    });
+        operatorMode: false
+      });
+    }
   }
 
   appendOperation = (o) => {
-    if (!this.state.operatorMode)
+    if (!this.state.operatorMode && !this.state.resultsDisplayed) {
       this.setState({
         operationString: this.state.operationString + this.state.currentValue + o,
         operatorMode: true
       });
+    } else if (this.state.resultsDisplayed) {
+      this.setState({
+        operationString: this.state.operationString + o,
+        currentValue: o,
+        operatorMode: true
+      });
+    }
   }
 
 }
@@ -152,8 +178,8 @@ const Keypad = (props) => {
         <button name='Back' onClick={e => props.onClick(e.target.name)} className='calc-button'>Back</button>
         <button name='CE' onClick={e => props.onClick(e.target.name)} className='calc-button'>CE</button>
         <button name='C' onClick={e => props.onClick(e.target.name)} className='calc-button'>C</button>
-        <button name='+/-' onClick={e => props.onClick(e.target.name)} className='calc-button'>+/-</button>
-        <button name='√' onClick={e => props.onClick(e.target.name)} className='calc-button'>√</button>
+        <button name='(' onClick={e => props.onClick(e.target.name)} className='calc-button'>(</button>
+        <button name=')' onClick={e => props.onClick(e.target.name)} className='calc-button'>)</button>
       </div>
       <div className='button-row'>
         <button name='7' onClick={e => props.onClick(e.target.name)} className='calc-button'>7</button>
@@ -167,7 +193,7 @@ const Keypad = (props) => {
         <button name='5' onClick={e => props.onClick(e.target.name)} className='calc-button'>5</button>
         <button name='6' onClick={e => props.onClick(e.target.name)} className='calc-button'>6</button>
         <button name='*' onClick={e => props.onClick(e.target.name)} className='calc-button'>*</button>
-        <button name='1/X' onClick={e => props.onClick(e.target.name)} className='calc-button'>1/X{/*1/the numver*/}</button>
+        <button name='+/-' onClick={e => props.onClick(e.target.name)} className='calc-button'>+/-</button>
       </div>
       <div className='button-row'>
         <button name='1' onClick={e => props.onClick(e.target.name)} className='calc-button'>1</button>

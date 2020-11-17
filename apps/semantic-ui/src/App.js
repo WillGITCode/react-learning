@@ -59,8 +59,7 @@ class App extends React.Component {
     });
   }
 
-
-  render() {
+  renderContent() {
     if (this.state.error && this.state.error.length > 0) {
       return (
         <h1>Error: {this.state.error}</h1>
@@ -72,6 +71,15 @@ class App extends React.Component {
       );
     }
     return <h2>Loading</h2>
+  }
+
+
+  render() {
+    return (
+      <div>
+        {this.renderContent()}
+      </div>
+    );
   }
 };
 
